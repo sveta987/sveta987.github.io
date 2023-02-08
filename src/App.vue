@@ -3,14 +3,10 @@
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
-import Dragg from "@/components/Dragg";
 
 export default {
   name: 'App',
   components: {
-    HelloWorld,
-    Dragg
   }
 }
 </script>
