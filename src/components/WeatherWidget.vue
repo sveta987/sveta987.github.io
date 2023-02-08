@@ -1,5 +1,5 @@
 <template>
-  <div class="widget md:w-[20%] m-auto mt-[50px] bg-[#839FCD] rounded-md">
+  <div class="widget md:w-[25%] m-auto mt-[50px] bg-[#839FCD] rounded-md">
     <div v-if="!isOpenSettings">
       <div v-if="isAskedForLocation" class="flex flex-col justify-center">
         <div v-if="!isClickedSearchButton">
@@ -13,7 +13,7 @@
         <div v-else>
           <label for="first-location" class="mx-[5%] mt-[15px] text-white text-xl">Please enter city name</label>
           <input id="first-location" type="text" v-model="firstCity"
-                 class="w-[93%] py-[10px] px-[5px] rounded-md border border-gray-200 m-[10px] bg-gray-200 text-[#9398C4]"
+                 class="w-[93%] py-[10px] px-[5px] rounded-md border border-gray-200 m-[10px] bg-gray-200 text-[#9398C4] outline-0"
                  @keyup.enter="getFirstCity"/>
           <button
               class="text-white px-[10px] py-[5px] border border-gray-600 bg-[#9398C4] mx-[30%] mb-[15px] rounded-md hover:bg-gray-100 hover:text-[#9398C4]"
@@ -24,7 +24,7 @@
       </div>
       <div v-else>
         <div class="flex justify-end">
-          <SettingIcon class="text-white cursor-pointer mr-[5px] mt-[5px]" @click="openSettings"/>
+          <img src="../assets/images/settings.png" alt="settings-icon" class="cursor-pointer mr-[10px] mt-[10px] w-[20px] h-[20px]" @click="openSettings"/>
         </div>
         <div class="weather-of-city" v-for="(city, index) of searchedCities" :key="index">
           <weather-of-the-city :city="city"/>
@@ -34,6 +34,7 @@
     <div v-else>
       <settings :cities="searchedCities" @closeSettings="closeSettings" @changeLocation="changeLocation"/>
     </div>
+    <error-message v-show="errorMessage" class="absolute top-[5%] bottom-[5%] left-[20%] right-[20%]" @closeErrorMessage="closeErrorMessage"><p class="text-center">{{ errorMessage }}</p></error-message>
   </div>
 </template>
 
@@ -41,14 +42,14 @@
 import axios from "axios";
 import WeatherOfTheCity from "@/components/WeatherOfTheCity"
 import Settings from "@/components/Settings"
-import SettingIcon from 'vue-ionicons/dist/md-settings.vue'
+import ErrorMessage from "@/components/ErrorMessage"
 
 export default {
   name: "WeatherWidget",
   components: {
     WeatherOfTheCity,
     Settings,
-    SettingIcon
+    ErrorMessage
   },
   data() {
     return {
@@ -57,6 +58,7 @@ export default {
       isClickedSearchButton: false,
       firstCity: null,
       isOpenSettings: false,
+      errorMessage: null
     }
   },
   methods: {
@@ -76,7 +78,7 @@ export default {
               this.isAskedForLocation = false
               localStorage.setItem('selectedCities', JSON.stringify(this.searchedCities))
             })
-            .catch(err => console.log(err))
+            .catch(err => this.errorMessage = err.message)
       }
     },
     openSettings() {
@@ -85,11 +87,14 @@ export default {
     closeSettings() {
       this.isOpenSettings = !this.isOpenSettings
       if (this.searchedCities.length === 0) {
-        this.isAskedForLocation = !this.isAskedForLocation;
+        this.isAskedForLocation = !this.isAskedForLocation
       }
     },
     changeLocation(locations) {
       this.searchedCities = locations
+    },
+    closeErrorMessage(){
+      this.errorMessage = null
     }
   },
   mounted() {
@@ -101,25 +106,23 @@ export default {
                 (response) => {
                   if (!this.searchedCities.find(city => city.id === response.data.id)) {
                     this.searchedCities.push(response.data)
+                    this.isAskedForLocation = false
+                    localStorage.setItem('selectedCities', JSON.stringify(this.searchedCities))
                   }
                 })
-            .then(() => {
-              this.isAskedForLocation = false
-              localStorage.setItem('selectedCities', JSON.stringify(this.searchedCities))
-            })
-            .catch(err => console.log(err))
+            .catch(err => this.errorMessage = err.message)
       }
       const errorCallback = (error) => {
-        console.log(error);
+        this.errorMessage = error
       };
       navigator.geolocation.getCurrentPosition(successCallback, errorCallback)
     } else {
-      console.log("Geolocation is not supported by this browser.")
+      this.errorMessage = "Geolocation is not supported by this browser."
     }
     this.isAskedForLocation = JSON.parse(localStorage.getItem('isAskedForLocation'))
     this.searchedCities = localStorage.getItem('selectedCities') ? JSON.parse(localStorage.getItem('selectedCities')) : []
     if (!this.searchedCities || this.searchedCities.length === 0) {
-      this.isAskedForLocation = !this.isAskedForLocation;
+      this.isAskedForLocation = !this.isAskedForLocation
       localStorage.setItem('isAskedForLocation', this.isAskedForLocation)
     }
   }

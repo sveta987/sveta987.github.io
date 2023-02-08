@@ -1,53 +1,56 @@
 <template>
-  <div class="flex justify-between text-white text-xl p-[5px]">
-    <h4>Settings</h4>
-    <p class="cursor-pointer" @click="closeSettings">X</p>
-  </div>
-  <div>
-    <draggable v-model="items" v-if="items.length > 0 && visible">
-      <template v-slot:item="{item}">
-        <div class="bg-[#A2BDDE] shadow-xl mt-[10px] flex justify-between mx-[5px] rounded-md text-white">
-          <div class="flex align-baseline py-[5px]">
-            <menu-icon class="m-[5px]"/>
-            <h3>{{ item.name }}, {{ item.sys.country }}</h3>
+  <div class="relative">
+    <div class="flex justify-between text-white text-xl p-[5px]">
+      <h4>Settings</h4>
+      <p class="cursor-pointer" @click="closeSettings">X</p>
+    </div>
+    <div>
+      <draggable v-model="items" v-if="items.length > 0 && visible">
+        <template v-slot:item="{item}">
+          <div class="bg-[#A2BDDE] shadow-xl mt-[10px] flex justify-between mx-[5px] rounded-md text-white">
+            <div class="flex align-baseline py-[5px]">
+              <img src="../assets/images/menu.png" alt="menu-icon" class="m-[5px] w-[16px] h-[16px]"/>
+              <h3>{{ item.name }}, {{ item.sys.country }}</h3>
+            </div>
+            <button @click="()=>{deleteCity(item.index)}">
+              <img src="../assets/images/trash.png" alt="trash-icon" class="m-[5px] w-[16px] h-[16px]"/>
+            </button>
           </div>
-          <button @click="()=>{deleteCity(item.index)}">
-            <TrashIcon class="m-[5px]"/>
-          </button>
-        </div>
-      </template>
-    </draggable>
-  </div>
-  <div class="flex flex-col justify-center">
-    <label for="first-location" class="mx-[5%] mt-[15px] text-white text-xl text-center">Add location</label>
-    <input id="first-location" type="text" v-model="searchedCity"
-           class="w-[93%] p-[5px] rounded-md border border-gray-200 m-[10px] bg-gray-200 text-[#9398C4]"
-           @keyup.enter="searchCity"/>
-    <button
-        class="text-white px-[10px] py-[5px] border border-gray-600 bg-[#9398C4] mx-[30%] mb-[15px] rounded-md hover:bg-gray-100 hover:text-[#9398C4]"
-        @click="searchCity">
-      Search city
-    </button>
+        </template>
+      </draggable>
+    </div>
+    <div class="flex flex-col justify-center">
+      <label for="first-location" class="mx-[5%] mt-[15px] text-white text-xl text-center">Add location</label>
+      <input id="first-location" type="text" v-model="searchedCity"
+             class="w-[93%] p-[5px] rounded-md border border-gray-200 m-[10px] bg-gray-200 text-[#9398C4] outline-0"
+             @keyup.enter="searchCity"/>
+      <button
+          class="text-white px-[10px] py-[5px] border border-gray-600 bg-[#9398C4] mx-[30%] mb-[15px] rounded-md hover:bg-gray-100 hover:text-[#9398C4]"
+          @click="searchCity">
+        Search city
+      </button>
+    </div>
+    <error-message v-show="errorMessage" class="absolute top-[5%] bottom-[5%] left-[20%] right-[20%]" @closeErrorMessage="closeErrorMessage"><p class="text-center">{{ errorMessage }}</p></error-message>
   </div>
 </template>
 
 <script>
-import MenuIcon from 'vue-ionicons/dist/md-menu.vue'
-import TrashIcon from 'vue-ionicons/dist/md-trash.vue'
 import Draggable from "vue3-draggable"
-import axios from "axios";
+import axios from "axios"
+import ErrorMessage from "@/components/ErrorMessage"
 
 export default {
   name: "Settings",
   props: ['cities'],
   emits: ['closeSettings', 'deleteCity', 'changeLocation'],
-  components: {MenuIcon, TrashIcon, Draggable},
+  components: {Draggable, ErrorMessage},
   data() {
     return {
       items: [],
       searchedCity: null,
       localCities: [],
-      visible: true
+      visible: true,
+      errorMessage: null
     }
   },
   watch: {
@@ -96,8 +99,11 @@ export default {
               })
               this.searchedCity = ''
             })
-            .catch(err => console.log(err))
+            .catch(err => this.errorMessage = err.message)
       }
+    },
+    closeErrorMessage(){
+      this.errorMessage = null
     }
   },
   beforeMount() {

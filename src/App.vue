@@ -1,6 +1,5 @@
 <template>
-<weather-widget />
-
+  <weather-widget/>
 </template>
 
 <script>

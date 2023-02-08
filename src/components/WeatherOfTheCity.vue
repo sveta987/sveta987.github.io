@@ -47,20 +47,21 @@ export default {
     kelvinToCelsius(kelvin) {
       return Math.floor(kelvin - 273.15)
     },
-    getTime(offset) {
+    getTime() {
       const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
       const dayNames = ['Mon', 'Tues', 'Wed', 'Thurs', 'Fri', 'Sat', 'Sun']
       let d = new Date();
 
       let utc = d.getTime() + (d.getTimezoneOffset() * 60000)
-      let nd = new Date(utc + (3600000 * (offset / 3600)))
+      let nd = new Date(utc + (3600000 * (this.city.timezone / 3600)))
 
       this.time = nd.getHours() + ":" + nd.getMinutes()
       this.date = months[nd.getMonth()] + ' ' + nd.getDate() + ' ' + nd.getFullYear() + ' ' + dayNames[nd.getDay() - 1]
     }
   },
   mounted() {
-    this.getTime(this.city.timezone)
+    this.getTime()
+    setInterval(this.getTime, 1000)
   }
 }
 </script>
