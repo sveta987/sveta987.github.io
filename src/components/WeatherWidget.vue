@@ -3,20 +3,20 @@
     <div v-if="!isOpenSettings">
       <div v-if="isAskedForLocation" class="flex flex-col justify-center">
         <div v-if="!isClickedSearchButton">
-          <h5 class="mx-[5%] mt-[15px] text-white text-xl">Please give access to your location, or click button on
+          <h5 class="mx-[5%] mt-[15px] text-white text-xl text-center">Please give access to your location, or click button on
             bellow.</h5>
           <button
-              class="text-white px-[10px] py-[5px] border border-gray-600 bg-[#9398C4] mx-[30%] mb-[15px] rounded-md hover:bg-gray-100 hover:text-[#9398C4]"
+              class="text-white px-[10px] py-[5px] border border-gray-600 bg-[#9398C4] mx-[40%] mb-[15px] rounded-md hover:bg-gray-100 hover:text-[#9398C4]"
               @click="searchFirstCity">Enter location
           </button>
         </div>
         <div v-else>
-          <label for="first-location" class="mx-[5%] mt-[15px] text-white text-xl">Please enter city name</label>
+          <label for="first-location" class="mx-[5%] mt-[15px] text-white text-xl text-center">Please enter city name</label>
           <input id="first-location" type="text" v-model="firstCity"
-                 class="w-[93%] py-[10px] px-[5px] rounded-md border border-gray-200 m-[10px] bg-gray-200 text-[#9398C4] outline-0"
+                 class="w-[93%] py-[10px] px-[5px] rounded-md border border-gray-200 m-[15px] bg-gray-200 text-[#9398C4] outline-0"
                  @keyup.enter="getFirstCity"/>
           <button
-              class="text-white px-[10px] py-[5px] border border-gray-600 bg-[#9398C4] mx-[30%] mb-[15px] rounded-md hover:bg-gray-100 hover:text-[#9398C4]"
+              class="text-white px-[10px] py-[5px] border border-gray-600 bg-[#9398C4] mx-[40%] mb-[15px] rounded-md hover:bg-gray-100 hover:text-[#9398C4]"
               @click="getFirstCity">
             Search city
           </button>
