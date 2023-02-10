@@ -5,11 +5,11 @@
       <p class="cursor-pointer" @click="closeSettings">X</p>
     </div>
     <div>
-      <draggable v-model="items" v-if="items.length > 0 && visible">
+      <draggable v-model="items" v-if="items.length > 0 && visible" forceFallback="true">
         <template v-slot:item="{item}">
-          <div class="bg-[#A2BDDE] shadow-xl mt-[10px] flex justify-between mx-[5px] rounded-md text-white">
+          <div class="bg-[#A2BDDE] shadow-xl mt-[10px] flex justify-between mx-[5px] rounded-md text-white hover:cursor-grab active:cursor-grabbing">
             <div class="flex align-baseline py-[5px]">
-              <img src="../assets/images/menu.png" alt="menu-icon" class="m-[5px] w-[16px] h-[16px]"/>
+              <img src="../assets/images/menu.png" alt="menu-icon" class="m-[5px] w-[16px] h-[16px] cursor-pointer"/>
               <h3>{{ item.name }}, {{ item.sys.country }}</h3>
             </div>
             <button @click="()=>{deleteCity(item.index)}">
@@ -50,7 +50,7 @@ export default {
       searchedCity: null,
       localCities: [],
       visible: true,
-      errorMessage: null
+      errorMessage: null,
     }
   },
   watch: {

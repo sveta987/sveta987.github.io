@@ -1,7 +1,7 @@
 <template>
   <div class="widget md:w-[25%] m-auto mt-[50px] bg-[#839FCD] rounded-md">
     <div v-if="!isOpenSettings">
-      <div v-if="isAskedForLocation" class="flex flex-col justify-center">
+      <div v-if="isAskedForLocation && !loading" class="flex flex-col justify-center">
         <div v-if="!isClickedSearchButton">
           <h5 class="mx-[5%] mt-[15px] text-white text-xl text-center">Please give access to your location, or click button on
             bellow.</h5>
@@ -34,7 +34,10 @@
     <div v-else>
       <settings :cities="searchedCities" @closeSettings="closeSettings" @changeLocation="changeLocation"/>
     </div>
-    <error-message v-show="errorMessage" class="absolute top-[5%] bottom-[5%] left-[20%] right-[20%]" @closeErrorMessage="closeErrorMessage"><p class="text-center">{{ errorMessage }}</p></error-message>
+    <error-message v-if="errorMessage" class="absolute top-[5%] bottom-[5%] left-[20%] right-[20%]" @closeErrorMessage="closeErrorMessage">
+      <p class="text-center">{{ errorMessage }}</p>
+    </error-message>
+    <spinner v-if="loading"/>
   </div>
 </template>
 
@@ -43,10 +46,12 @@ import axios from "axios";
 import WeatherOfTheCity from "@/components/WeatherOfTheCity"
 import Settings from "@/components/Settings"
 import ErrorMessage from "@/components/ErrorMessage"
+import Spinner from "@/components/Spinner"
 
 export default {
   name: "WeatherWidget",
   components: {
+    Spinner,
     WeatherOfTheCity,
     Settings,
     ErrorMessage
@@ -58,7 +63,8 @@ export default {
       isClickedSearchButton: false,
       firstCity: null,
       isOpenSettings: false,
-      errorMessage: null
+      errorMessage: null,
+      loading: false
     }
   },
   methods: {
@@ -100,6 +106,7 @@ export default {
   mounted() {
     if (navigator.geolocation) {
       const successCallback = (position) => {
+        this.loading = true
         axios
             .get(`https://api.openweathermap.org/data/2.5/weather?lat=${position.coords.latitude}&lon=${position.coords.longitude}&appid=01698da9b05c6e3a89f85a90b8443b7f`)
             .then(
@@ -107,13 +114,14 @@ export default {
                   if (!this.searchedCities.find(city => city.id === response.data.id)) {
                     this.searchedCities.push(response.data)
                     this.isAskedForLocation = false
+                    this.loading = false
                     localStorage.setItem('selectedCities', JSON.stringify(this.searchedCities))
                   }
                 })
             .catch(err => this.errorMessage = err.message)
       }
-      const errorCallback = (error) => {
-        this.errorMessage = error
+      const errorCallback = () => {
+        this.isClickedSearchButton = true
       };
       navigator.geolocation.getCurrentPosition(successCallback, errorCallback)
     } else {
