@@ -55,7 +55,7 @@ export default {
       let utc = d.getTime() + (d.getTimezoneOffset() * 60000)
       let nd = new Date(utc + (3600000 * (this.city.timezone / 3600)))
 
-      this.time = nd.getHours() + ":" + nd.getMinutes()
+      this.time = (((nd.getHours() <= 9 && nd.getHours() >= 0) || '') && '0')  + nd.getHours()  + ":" + (((nd.getMinutes() <= 9 && nd.getMinutes() >= 0) || '') && '0') + nd.getMinutes()
       this.date = months[nd.getMonth()] + ' ' + nd.getDate() + ' ' + nd.getFullYear() + ' ' + dayNames[nd.getDay() - 1]
     }
   },

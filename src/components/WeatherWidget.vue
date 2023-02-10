@@ -134,6 +134,22 @@ export default {
       this.isAskedForLocation = !this.isAskedForLocation
       localStorage.setItem('isAskedForLocation', this.isAskedForLocation)
     }
+
+    setInterval(()=>{
+      let cities = []
+      this.searchedCities.map(city => cities.push(city.name))
+
+      cities.forEach(city => {
+        axios
+            .get(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=01698da9b05c6e3a89f85a90b8443b7f`)
+            .then(
+                (response) => {
+                  this.searchedCities[this.searchedCities.indexOf(this.searchedCities.find(item => item.name === city))] = response.data
+                })
+            .catch(err => this.errorMessage = err.message)
+      })
+
+    }, 60000)
   }
 }
 </script>
