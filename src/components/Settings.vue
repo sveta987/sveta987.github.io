@@ -90,15 +90,13 @@ export default {
                   if (!this.items.find(item => item.id === response.data.id)) {
                     this.items.push(response.data)
                   }
+                  this.changeLocations()
+                  this.visible = false
+                  this.$nextTick(() => {
+                    this.visible = true
+                  })
+                  this.searchedCity = ''
                 })
-            .then(() => {
-              this.changeLocations()
-              this.visible = false
-              this.$nextTick(() => {
-                this.visible = true
-              })
-              this.searchedCity = ''
-            })
             .catch(err => this.errorMessage = err.message)
       }
     },

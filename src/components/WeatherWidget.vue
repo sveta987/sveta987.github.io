@@ -3,7 +3,7 @@
     <div v-if="!isOpenSettings">
       <div v-if="isAskedForLocation && !loading" class="flex flex-col justify-center">
         <div v-if="!isClickedSearchButton">
-          <h5 class="mx-[5%] mt-[15px] text-white text-xl text-center">Please give access to your location, or click button on
+          <h5 class="mx-[5%] mt-[15px] text-white text-xl !text-center">Please give access to your location, or click button on
             bellow.</h5>
           <button
               class="text-white px-[10px] py-[5px] border border-gray-600 bg-[#9398C4] mx-[40%] mb-[15px] rounded-md hover:bg-gray-100 hover:text-[#9398C4]"
@@ -11,7 +11,7 @@
           </button>
         </div>
         <div v-else>
-          <label for="first-location" class="mx-[5%] mt-[15px] text-white text-xl text-center">Please enter city name</label>
+          <label for="first-location" class="mx-[5%] mt-[15px] text-white text-xl !text-center">Please enter city name</label>
           <input id="first-location" type="text" v-model="firstCity"
                  class="w-[93%] py-[10px] px-[5px] rounded-md border border-gray-200 m-[15px] bg-gray-200 text-[#9398C4] outline-0"
                  @keyup.enter="getFirstCity"/>
@@ -94,6 +94,7 @@ export default {
       this.isOpenSettings = !this.isOpenSettings
       if (this.searchedCities.length === 0) {
         this.isAskedForLocation = !this.isAskedForLocation
+        this.isClickedSearchButton = !this.isClickedSearchButton
       }
     },
     changeLocation(locations) {
@@ -111,12 +112,12 @@ export default {
             .get(`https://api.openweathermap.org/data/2.5/weather?lat=${position.coords.latitude}&lon=${position.coords.longitude}&appid=01698da9b05c6e3a89f85a90b8443b7f`)
             .then(
                 (response) => {
-                  if (!this.searchedCities.find(city => city.id === response.data.id)) {
+                  if (this.searchedCities.length === 0) {
                     this.searchedCities.push(response.data)
-                    this.isAskedForLocation = false
-                    this.loading = false
                     localStorage.setItem('selectedCities', JSON.stringify(this.searchedCities))
                   }
+                  this.loading = false
+                  this.isAskedForLocation = false
                 })
             .catch(err => this.errorMessage = err.message)
       }
